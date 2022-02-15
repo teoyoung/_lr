@@ -1,20 +1,18 @@
-import React, { Component } from 'react'
-import ShopWindows from './pages/ShopWindows'
-import Header from './components/Header'
-import Authorization from './pages/Authorization';
+import React from 'react'
+import ShopWindowsPage from './pages/ShopWindowsPage'
+import Header from './parts/Header'
 import {
     BrowserRouter,
-    Route,
     Switch,
-    Redirect
   } from "react-router-dom";
-import { UseAppSelector } from './Store';
+import { UseAppSelector, UseAppDispatch } from './Store';
 import { AuthRouter } from './routers/AuthRouter';
 import { RegistrationRouter } from './routers/RegistrationRouter';
-import { SelectLogin } from './api/UserAPI';
 import { createGlobalStyle } from 'styled-components'
-import ShoPage from './pages/ShoPage';
-import CheckoutPage from './pages/Checkout';
+import ShopPage from './pages/ShopPage';
+import CheckoutPage from './pages/CheckoutPage';
+import AuthPage from './pages/AuthPage';
+import {FetchLoginPing, SelectLogin} from './store/UserSlice';
 
 export const GlobalStyle = createGlobalStyle`
   * {
@@ -29,17 +27,20 @@ export const GlobalStyle = createGlobalStyle`
 
 export default function App() {
 
-    const isLogin = UseAppSelector(SelectLogin);
+    const isLogin = UseAppSelector(SelectLogin); 
+    const dispath = UseAppDispatch(); 
+    dispath(FetchLoginPing());
+
     return (
         <div>
             <GlobalStyle />
             <BrowserRouter>
               <Header/>
                 <Switch>
-                    <RegistrationRouter exact path="/" children={<Authorization />} auth={isLogin} />
-                    <AuthRouter path="/sale" children={<ShopWindows />} />
-                    <AuthRouter path="/shop" children={<ShoPage />} />
-                    <AuthRouter path="/checkout" children={<CheckoutPage />} />
+                    <RegistrationRouter exact path="/" children={<AuthPage />} isLogin={isLogin} />
+                    <AuthRouter isLogin={isLogin} path="/sale" children={<ShopWindowsPage />} />
+                    <AuthRouter isLogin={isLogin} path="/shop" children={<ShopPage />} />
+                    <AuthRouter isLogin={isLogin} path="/checkout" children={<CheckoutPage />} />
                 </Switch>
             </BrowserRouter>
         </div>
